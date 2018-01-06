@@ -173,7 +173,7 @@ class Board extends CI_Controller {
 		}
 		else
 		{
-			alert('로그인후 작성하세요', '/bbs/auth/login/');
+			alert('로그인후 작성해주시기 바랍니다.', '/bbs/auth/login/');
 			exit;
 		}
  	}

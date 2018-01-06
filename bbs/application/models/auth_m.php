@@ -21,8 +21,8 @@ class Auth_m extends CI_Model
 	 */
     function login($auth)
     {
-    	$sql = "SELECT username, email FROM users WHERE username = '".$auth['username']."' AND password = '".$auth['password']."' ";
-   		$query = $this->db->query($sql);
+		$sql = "SELECT username, email, password FROM users WHERE username = '".$auth['username']."' ";
+		$query = $this->db->query($sql);
 
 		if ( $query->num_rows() > 0 )
      	{
@@ -34,8 +34,8 @@ class Auth_m extends CI_Model
      		//맞는 데이터가 없을 경우
 	    	return FALSE;
      	}
-    }
-
+	}
+	
 }
 
 /* End of file auth_m.php */

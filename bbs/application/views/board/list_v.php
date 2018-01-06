@@ -55,7 +55,10 @@ foreach ($list as $lt)
 				</tr>
 			</tfoot>
 		</table>
-		<div><p><a href="/bbs/board/write/<?php echo $this->uri->segment(3);?>/page/<?php echo $this->uri->segment(5);?>" class="btn btn-success">쓰기</a></p></div>
+		<div>
+		<p><a href="/bbs/board/write/<?php echo $this->uri->segment(3);?>/page/<?php echo $this->uri->segment(5);?>" class="btn btn-success">쓰기</a></p>
+		<p><a href="/bbs/controlls/upload_file" class="btn btn-success">이미지 업로드</a></p>
+		</div>
 		<div>
 			<form method="post" class="well form-search" id="bd_search">
 			<?php echo form_hidden($this->security->get_csrf_token_name(), $this->security->get_csrf_hash()); ?>

@@ -53,7 +53,7 @@ $db['default']['username'] = 'book_user';
 $db['default']['password'] = 'book_password';
 
 $db['default']['database'] = 'ci_book';
-$db['default']['dbdriver'] = 'mysql';
+$db['default']['dbdriver'] = 'mysqli';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = FALSE;
 $db['default']['db_debug'] = TRUE;

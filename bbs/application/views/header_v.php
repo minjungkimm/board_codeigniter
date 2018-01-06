@@ -9,6 +9,7 @@
 	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script src="/bbs/static/lib/ckeditor/ckeditor.js"></script>
 	<link rel='stylesheet' href="/bbs/include/css/bootstrap.css" />
 </head>
 <body>
@@ -28,6 +29,7 @@ if( @$this->session->userdata['logged_in'] == TRUE )
 } else {
 ?>
 <a href="/bbs/auth/login" class="btn btn-primary">로그인</a>
+<a href="/bbs/auth/register" class="btn btn-primary">회원가입</a>
 <?php
 }
 ?>
