@@ -9,6 +9,7 @@ class Auth extends CI_Controller {
  	function __construct()
 	{
 		parent::__construct();
+		//echo phpinfo();
         $this->load->model('auth_m');
 		$this->load->helper('form');
 	}
@@ -51,6 +52,8 @@ class Auth extends CI_Controller {
 		
 		//회원정보 모델
 		$this->load->model('user_m');
+		$input = $this->input->post(NULL, TRUE);
+
 
 		//폼 검증할 필드와 규칙 사전 정의
 		$this->form_validation->set_rules('username', '아이디', 'required|alpha_numeric');
@@ -61,7 +64,7 @@ class Auth extends CI_Controller {
 		if ( $this->form_validation->run() == TRUE )
   		{
 	 		$auth_data = array(
-				'username' => $this->input->post('username', TRUE),
+				'username' => trim($input['username']),
 				'email' => $this->input->post('email', TRUE),
 				'password' => $this->input->post('password', TRUE) 
 	  		);
@@ -72,14 +75,14 @@ class Auth extends CI_Controller {
    			{
    				//세션 생성
 				$newdata = array(
-                   'username'  => $result->username,
+                   'user_id'  => $result->user_id,
                    'email'     => $result->email,
                    'logged_in' => TRUE
 				);
 
 				//사용자가 입력한 값과 디비상의 정보가 일치함에 따라 = 계정 정보 존재유무에 따라 로그인하고,
 				//암호화된 비밀번호값과 입력한 비밀번호값이 일치하는지 확인
-				if($auth_data['username'] == $newdata['username'] && password_verify($auth_data['password'],$result->password))
+				if($auth_data['username'] == $newdata['user_id'] && password_verify($auth_data['password'],$result->password))
 				{	
 					$this->session->set_userdata($newdata);
 					alert('로그인 되었습니다.', '/bbs/board/lists/ci_board/page/1');
@@ -87,7 +90,7 @@ class Auth extends CI_Controller {
 				}
 				else
 				{
-					alert('아이디 또는 비밀번호가 틀렸습니다.','/bbs/auth/login');
+					alert(ID_PASSWORD_NOT_MATCHED,'/bbs/auth/login');
 					exit;
 				}
   				

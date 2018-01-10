@@ -63,6 +63,12 @@ class Controlls extends CI_Controller {
 			if ( $this->form_validation->run() == TRUE )
 			{
 
+				$info = array(
+					'user_id' => $this->session->userdata['user_id'],
+					'subject' => $this->input->post('subject', TRUE),
+					'contents' => $this->input->post('contents', TRUE) 
+				  );
+
                 $config['upload_path'] = './static/user';
                 $config['allowed_types'] = 'gif|jpg|png';
                 $config['max_size'] = '100';
@@ -78,12 +84,37 @@ class Controlls extends CI_Controller {
                 }
                 else
                 {
-                    $data = array('upload_data' => $this->upload->data());
-                    var_dump($data);
-                    
-                    //$result = $this->upload_m->insert_file($data);
+					//$data = array('upload_data' => $this->upload->data());
+					$upload_data = $this->upload->data();
+					//var_dump($upload_data);
 
-                    /*if($result)
+					//var_dump($upload_data['file_path']);
+					
+					$imagePathStrPos =strpos($upload_data['file_path'], '/bbs');
+					$imagePath=substr($upload_data['file_path'], $imagePathStrPos);
+
+					//var_dump($imagePath);
+
+					$upload_data['file_path'] = $imagePath;
+
+					//var_dump($upload_data['file_path']);
+					
+					$config['image_library'] = 'gd2';
+					$config['source_image'] = $upload_data['file_path'].$upload_data['file_name'];
+					$config['create_thumb'] = TRUE; //썸네일 생성
+					$config['new_image'] = './static/user/thumb/'.$upload_data['file_name']; //복사본 생성할 경우
+					$config['maintain_ratio'] = TRUE;
+					$config['width'] = 16;
+					$config['height'] = 16;
+				
+					$this->load->library('image_lib',$config);
+					
+					$this->image_lib->resize();
+					$this->image_lib->crop();
+
+					$result = $this->upload_m->insert_file($upload_data,$info);
+
+                    if($result)
                     {
                         alert('업로드에 성공하였습니다.', '/bbs/board/lists/ci_board/page/1');
                         exit;
@@ -93,7 +124,7 @@ class Controlls extends CI_Controller {
                     {
                         alert('다시 업로드해주시길 바랍니다.', '/bbs/controlls/upload_file');
 					    exit;      
-                    }*/
+					}
                 
                 }
 			}
@@ -110,6 +141,11 @@ class Controlls extends CI_Controller {
 		}
  	}
 
+
+	function thumb_view()
+	{
+
+	}
 
 
 }

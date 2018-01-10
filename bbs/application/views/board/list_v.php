@@ -24,6 +24,7 @@
 			<thead>
 				<tr>
 					<th scope="col">번호</th>
+					<th scope="col">썸네일</th>
 					<th scope="col">제목</th>
 					<th scope="col">작성자</th>
 					<th scope="col">조회수</th>
@@ -37,11 +38,11 @@ foreach ($list as $lt)
 ?>
 				<tr>
 					<th scope="row">
-						<?php echo $lt->board_id;?>
-					</th>
-					<td><a rel="external" href="/bbs/<?php echo $this->uri->segment(1);?>/view/<?php echo $this->uri->segment(3);?>/board_id/<?php echo $lt->board_id;?>/page/<?php echo $page;?>"><?php echo $lt->subject;?></a></td>
-					<td><?php echo $lt->user_name;?></td>
-					<td><?php echo $lt->hits;?></td>
+						<?php echo $lt->seq_id;?>
+					<td><img src="<?php echo $lt->file_path.$lt->file_name;?>" width="100px" height="100px"></td>
+					<td><a rel="external" href="/bbs/<?php echo $this->uri->segment(1);?>/view/<?php echo $this->uri->segment(3);?>/board_id/<?php echo $lt->seq_id;?>/page/<?php echo $page;?>"><?php echo $lt->subject;?></a></td>
+					<td><?php echo $lt->user_id;?></td>
+					<td><?php echo $lt->hit;?></td>
 					<td><time datetime="<?php echo mdate("%Y-%M-%j", human_to_unix($lt->reg_date));?>"><?php echo mdate("%M. %j, %Y", human_to_unix($lt->reg_date));?></time></td>
 				</tr>
 <?php

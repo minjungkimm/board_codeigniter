@@ -32,8 +32,8 @@ class Ajax_board extends CI_Controller {
 		{
 			$this->load->model('board_m');
 
-			$table = $this->input->post("table", TRUE);;
-			$board_id = $this->input->post("board_id", TRUE);;
+			$table = $this->input->post("table", TRUE);
+			$board_id = $this->input->post("board_id", TRUE);
 			$comment_contents = $this->input->post("comment_contents", TRUE);
 
 			if ( $comment_contents != '')
@@ -43,15 +43,17 @@ class Ajax_board extends CI_Controller {
 					'board_pid' => $board_id, //원글 번호
 					'subject' => '',
 					'contents' => $comment_contents,
-					'user_id' => $this->session->userdata('username')
+					'user_id' => $this->session->userdata('user_id')
 				);
+
+				var_dump($write_data);
 
 				$result = $this->board_m->insert_comment($write_data);
 
 				if ( $result )
 				{
 					//글 작성 성공시 댓글 목록 만들어 화면 출력
-					$sql = "SELECT * FROM ".$table." WHERE board_pid = '".$board_id."' ORDER BY board_id DESC";
+					$sql = "SELECT * FROM ".$table." WHERE board_pid = '".$board_id."' ORDER BY seq_id DESC";
 					$query = $this->db->query($sql);
 ?>
 	<table cellspacing="0" cellpadding="0" class="table table-striped" id="comment_table">
@@ -59,13 +61,14 @@ class Ajax_board extends CI_Controller {
 foreach ($query->result() as $lt)
 {
 ?>
-			<tr id="row_num_<?php echo $lt->board_id;?>"> 
+			<tr id="<?php echo $lt->seq_id;?>">
 				<th scope="row">
 					<?php echo $lt->user_id;?>
 				</th>
 				<td><?php echo $lt->contents;?></a></td>
 				<td><time datetime="<?php echo mdate("%Y-%M-%j", human_to_unix($lt->reg_date));?>"><?php echo $lt->reg_date;?></time></td>
-				<td><a href="#" class="comment_delete" vals="<?php echo $lt->board_id;?>"><i class="icon-trash"></i>삭제</a></td>
+				<td><a href="#" class="comment_re" vals="<?php echo $lt->seq_id;?>"><i class="icon-trash"></i>댓글</a></td>
+				<td><a href="#" class="comment_delete" vals="<?php echo $lt->seq_id;?>"><i class="icon-trash"></i>삭제</a></td>
 			</tr>
 <?php
 }
@@ -93,6 +96,82 @@ foreach ($query->result() as $lt)
 		}
 	}
 
+
+	public function ajax_comment_re()
+	{
+		if( @$this->session->userdata('logged_in') == TRUE )
+		{
+			$this->load->model('board_m');
+
+			$table = $this->input->post("table", TRUE);
+			$board_id = $this->input->post("board_id", TRUE);
+			$comment_contents = $this->input->post("comment_contents", TRUE);
+			$reply_pid = $this->input->post("reply_pid", TRUE);
+
+			if ( $comment_contents != '')
+			{
+				$write_data = array(
+					'table' => $table, //게시판 테이블명
+					'board_pid' => $board_id, //원글 번호
+					'comment_contents' => $comment_contents,
+					'reply_pid' => $reply_pid,
+					'user_id' => $this->session->userdata('user_id')
+				);
+
+				var_dump($write_data);
+
+				$result = $this->board_m->insert_comment_re($write_data);
+
+				if ( $result )
+				{
+					//글 작성 성공시 댓글 목록 만들어 화면 출력
+					$sql = "SELECT * FROM ".$table." WHERE board_pid = '".$board_id."' AND reply_pid = '".$reply_pid."' ORDER BY seq_id DESC";
+					$query = $this->db->query($sql);
+
+?>
+<?php
+
+foreach ($query->result() as $lt)
+{
+?>
+			<tr id="<?php echo $lt->seq_id;?>">
+				<th scope="row">
+				→
+					<?php echo $lt->user_id;?>
+				</th>
+				<td><?php echo $lt->comment_contents;?></a></td>
+				<td><time datetime="<?php echo mdate("%Y-%M-%j", human_to_unix($lt->reg_date));?>"><?php echo $lt->reg_date;?></time></td>
+				<td><a href="#" class="comment_re" vals="<?php echo $lt->seq_id;?>"><i class="icon-trash"></i>댓글</a></td>
+				<td><a href="#" class="comment_delete" vals="<?php echo $lt->seq_id;?>"><i class="icon-trash"></i>삭제</a></td>
+			</tr>
+<?php
+}
+?>
+
+<?php
+				}
+				else
+				{
+					//글 실패시
+					echo "2000";
+				}
+
+			}
+			else
+			{
+				//글 내용이 없을 경우
+				echo "1000";
+			}
+		}
+		else
+		{
+			echo "9000"; //로그인 필요 에러
+		}
+	}
+
+
+
+
 	public function ajax_comment_delete()
 	{
 		if( @$this->session->userdata('logged_in') == TRUE )
@@ -105,7 +184,7 @@ foreach ($query->result() as $lt)
 			//글 작성자가 본인인지 검증
 			$writer_id = $this->board_m->writer_check($table, $board_id);
 
-			if( $writer_id->user_id != $this->session->userdata('username') )
+			if( $writer_id->user_id != $this->session->userdata('user_id') )
 			{
 				echo "8000"; //본인이 작성한 글이 아닙니다.
 			}

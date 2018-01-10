@@ -8,7 +8,7 @@
 				data:{
 					"comment_contents":encodeURIComponent($("#input01").val()),
 					"csrf_test_name":getCookie('csrf_cookie_name'),
-					"table":"<?php echo $this->uri->segment(3);?>",
+					"table":"reply",
 					"board_id":"<?php echo $this->uri->segment(5);?>"
 				},
 				dataType: "html",
@@ -29,8 +29,8 @@
 						}
 						else
 						{
-							$("#comment_area").html(xhr.responseText);
-							$("#input01").val('');
+							$("#comment_area").append(xhr.responseText);
+							location.reload();
 						}
 					}
 				}
@@ -66,12 +66,59 @@
 						{
 							$('#row_num_'+xhr.responseText).remove();
 							alert('삭제되었습니다.');
+							location.reload();
 						}
 					}
 				}
 			});
 		});
+
+
+	/* */
+		$(".comment_re").click(function(){
+			var reply_pid = $(this).parent().parent().attr('id');
+			console.log(reply_pid);
+			$.ajax({
+				url: "/bbs/ajax_board/ajax_comment_re",
+				type: "POST",
+				data:{
+					"comment_contents":encodeURIComponent($("#input01").val()),
+					"csrf_test_name":getCookie('csrf_cookie_name'),
+					"table":"reply",
+					"board_id":"<?php echo $this->uri->segment(5);?>",
+					"reply_pid":reply_pid
+				},
+				dataType: "html",
+				complete:function(xhr, textStatus){
+					if (textStatus == 'success')
+					{
+						if ( xhr.responseText == 1000 )
+						{
+							alert('댓글 내용을 입력하세요');
+						}
+						else if ( xhr.responseText == 2000 )
+						{
+							alert('다시 입력하세요');
+						}
+						else if ( xhr.responseText == 9000 )
+						{
+							alert('로그인하여야 합니다.');
+						}
+						else
+						{
+							$(this).parent().parent().append(xhr.responseText);
+							//console.log(xhr.responseText);
+							location.reload();
+						}
+					}
+				}
+			});
+		});
+
+	
+	/* */
 	});
+
 
 	function getCookie( name )
 	{
@@ -109,8 +156,8 @@
 			<thead>
 				<tr>
 					<th scope="col"><?php echo $views->subject;?></th>
-					<th scope="col">이름 : <?php echo $views->user_name;?></th>
-					<th scope="col">조회수 : <?php echo $views->hits;?></th>
+					<th scope="col">이름 : <?php echo $views->user_id;?></th>
+					<th scope="col">조회수 : <?php echo $views->hit;?></th>
 					<th scope="col">등록일 : <?php echo $views->reg_date;?></th>
 				</tr>
 			</thead>
@@ -146,14 +193,34 @@
 foreach ($comment_list as $lt)
 {
 ?>
-				<tr id="row_num_<?php echo $lt->board_id;?>">
+				<tr id="<?php echo $lt->seq_id;?>">
 					<th scope="row">
 						<?php echo $lt->user_id;?>
 					</th>
 					<td><?php echo $lt->contents;?></a></td>
 					<td><time datetime="<?php echo mdate("%Y-%M-%j", human_to_unix($lt->reg_date));?>"><?php echo $lt->reg_date;?></time></td>
-					<td><a href="#" class="comment_delete" vals="<?php echo $lt->board_id;?>"><i class="icon-trash"></i>삭제</a></td>
+					<td><a href="#" class="comment_re" vals="<?php echo $lt->seq_id;?>"><i class="icon-flag"></i>댓글</a></td>
+					<td><a href="#" class="comment_delete" vals="<?php echo $lt->seq_id;?>"><i class="icon-trash"></i>삭제</a></td>
 				</tr>
+		
+
+				<?php
+					foreach ($recomment_list as $ltt){ ?>
+						<?php if($lt->seq_id == $ltt->reply_pid):  ?>	
+						<tr id="<?php echo $ltt->seq_id;?>">
+							<th scope="row">
+							→
+								<?php echo $ltt->user_id;?>
+							</th>
+							<td><?php echo $ltt->comment_contents;?></a></td>
+							<td><time datetime="<?php echo mdate("%Y-%M-%j", human_to_unix($ltt->reg_date));?>"><?php echo $ltt->reg_date;?></time></td>
+							<td><a href="#" class="comment_re" vals="<?php echo $ltt->seq_id;?>"><i class="icon-flag"></i>댓글</a></td>
+							<td><a href="#" class="comment_delete" vals="<?php echo $ltt->seq_id;?>"><i class="icon-trash"></i>삭제</a></td>
+						</tr>
+						<?php endif; ?>
+				 <?php }?>
+
+		
 <?php
 }
 ?>

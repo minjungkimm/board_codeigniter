@@ -11,6 +11,10 @@
 		    <legend>게시물 쓰기</legend>
 		    <div class="control-group">
 		      <label class="control-label" for="input01">제목</label>
+					<div class="controls">
+						<input type="file" class="input-xlarge" id="input01" name="upload_file" value="<?php echo set_value('filename'); ?>">
+						<p class="help-block">파일을 선택해주세요.</p>
+					</div>
 		      <div class="controls">
 		        <input type="text" class="input-xlarge" id="input01" name="subject" value="<?php echo set_value('subject'); ?>">
 		        <p class="help-block">게시물의 제목을 써주세요.</p>

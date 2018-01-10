@@ -80,18 +80,18 @@ class Board extends CI_Controller {
 		//게시판 목록을 불러오기 위한 offset, limit 값 가져오기
 		$data['page'] = $page = $this->uri->segment($uri_segment, 1);
 
-		if ( $page > 1 )
-		{
+		if ( $page > 1 ) {
 			$start = (($page/$config['per_page'])) * $config['per_page'];
 		}
-		else
-		{
+		else {
 			$start = ($page-1) * $config['per_page'];
 		}
 
 		$limit = $config['per_page'];
 
 		$data['list'] = $this->board_m->get_list($this->uri->segment(3), '', $start, $limit, $search_word);
+
+
 		$this->load->view('board/list_v', $data);
 	}
 
@@ -104,7 +104,13 @@ class Board extends CI_Controller {
 		$board_id = $this->uri->segment(5);
 
  		//게시판 이름과 게시물 번호에 해당하는 게시물 가져오기
- 		$data['views'] = $this->board_m->get_view($table, $board_id);
+		 $data['views'] = $this->board_m->get_view($table, $board_id);
+		 
+		 //게사판 댓글
+		 $data['comment_list'] = $this->board_m->get_comment($table,$board_id);
+
+		 //게사판 댓글
+		 $data['recomment_list'] = $this->board_m->get_recomment('reply',$board_id);
 
  		//view 호출
  		$this->load->view('board/view_v', $data);
@@ -146,7 +152,7 @@ class Board extends CI_Controller {
 					'table' => $this->uri->segment(3), //게시판 테이블명
 					'subject' => $this->input->post('subject', TRUE),
 					'contents' => $this->input->post('contents', TRUE),
-					'user_id' => $this->session->userdata('username')
+					'user_id' => $this->session->userdata('user_id')
 				);
 
 				$result = $this->board_m->insert_board($write_data);
@@ -204,7 +210,7 @@ class Board extends CI_Controller {
 			//수정하려는 글의 작성자가 본인인지 검증
 			$writer_id = $this->board_m->writer_check($this->uri->segment(3), $this->uri->segment(5));
 
-			if( $writer_id->user_id != $this->session->userdata('username') )
+			if( $writer_id->user_id != $this->session->userdata('user_id') )
 			{
 				alert('본인이 작성한 글이 아닙니다.', '/bbs/board/view/'.$this->uri->segment(3).'/board_id/'.$this->uri->segment(5).'/page/'.$pages);
 				exit;
@@ -283,7 +289,7 @@ class Board extends CI_Controller {
 
 			$writer_id = $this->board_m->writer_check($table, $board_id);
 
-			if( $writer_id->user_id != $this->session->userdata('username') )
+			if( $writer_id->user_id != $this->session->userdata('user_id') )
 			{
 				alert('본인이 작성한 글이 아닙니다.', '/bbs/board/view/'.$this->uri->segment(3).'/board_id/'.$this->uri->segment(5).'/page/'.$this->uri->segment(7));
 				exit;

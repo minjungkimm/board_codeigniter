@@ -23,10 +23,10 @@ class User_m extends CI_Model
         $this->load->helper('password');
         $password_security=password_hash($option['password'],PASSWORD_BCRYPT);
 
-        $this->db->set('username',$option['username']);
+        $this->db->set('user_id',$option['username']);
         $this->db->set('email',$option['email']);
         $this->db->set('password',$password_security);
-        $this->db->set('name',$option['nickname']);
+        $this->db->set('user_name',$option['nickname']);
         $this->db->set('reg_date','NOW()',false);
         $this->db->insert('users');
         $result = $this->db->insert_id();

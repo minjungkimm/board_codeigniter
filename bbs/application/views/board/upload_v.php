@@ -34,7 +34,7 @@
 
 			<div class="form-actions">
 				<button type="submit" class="btn btn-primary" id="write_btn">이미지 업로드</button>
-				<button type="button" class="btn" onclick="window.location.href='/bbs/board/lists/<?php echo $this->uri->segment(3)?>/page/<?php echo $this->uri->segment(7)?>'">취소</button>
+				<button type="button" class="btn" onclick="window.location.href='/bbs/board/lists/ci_board/page/1'">취소</button>
 			</div>
 		</div>
 	</fieldset>

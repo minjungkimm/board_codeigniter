@@ -21,19 +21,15 @@ class Auth_m extends CI_Model
 	 */
     function login($auth)
     {
-		$sql = "SELECT username, email, password FROM users WHERE username = '".$auth['username']."' ";
+		$sql = "SELECT user_id, email, password FROM users WHERE user_id = '".$auth['username']."' ";
 		$query = $this->db->query($sql);
 
-		if ( $query->num_rows() > 0 )
-     	{
+		if ( $query->num_rows() > 0 ) {
 			//맞는 데이터가 있다면 해당 내용 반환
      		return $query->row();
-     	}
-     	else
-     	{
-     		//맞는 데이터가 없을 경우
-	    	return FALSE;
-     	}
+		}
+		
+		return FALSE;
 	}
 	
 }

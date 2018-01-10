@@ -42,7 +42,7 @@ class Board_m extends CI_Model
      		$limit_query = ' LIMIT '.$offset.', '.$limit;
      	}
 
-    	$sql = "SELECT * FROM ".$table.$sword." AND board_pid = '0' ORDER BY board_id DESC".$limit_query;
+    	$sql = "SELECT * FROM ".$table.$sword." AND board_pid = '0' ORDER BY seq_id DESC".$limit_query;
    		$query = $this->db->query($sql);
 
 		if ( $type == 'count' )
@@ -69,13 +69,16 @@ class Board_m extends CI_Model
 	 * @param string $id 게시물번호
 	 * @return array
 	 */
-    function get_view($table, $id)
+    function get_view($table= null, $id)
     {
+		if(!$id){
+			return null;
+		}
     	//조회수 증가
-    	$sql0 = "UPDATE ".$table." SET hits=hits+1 WHERE board_id='".$id."'";
+    	$sql0 = "UPDATE ".$table." SET hit=hit+1 WHERE seq_id='".$id."'";
    		$this->db->query($sql0);
 
-    	$sql = "SELECT * FROM ".$table." WHERE board_id='".$id."'";
+    	$sql = "SELECT * FROM ".$table." WHERE seq_id='".$id."'";
    		$query = $this->db->query($sql);
 
      	//게시물 내용 반환
@@ -91,12 +94,11 @@ class Board_m extends CI_Model
 	 * @param array $arrays 테이블명, 게시물제목, 게시물내용, 아이디 1차 배열
 	 * @return boolean 입력 성공여부
 	 */
-	function insert_board($arrays)
+	function insert_board($borad_info = null)
  	{
 		$insert_array = array(
 			'board_pid' => 0, //원글이라 0을 입력, 댓글일 경우 원글번호 입력
 			'user_id' => $arrays['user_id'],
-			'user_name' => $arrays['user_id'],
 			'subject' => $arrays['subject'],
 			'contents' => $arrays['contents'],
 			'reg_date' => date("Y-m-d H:i:s")
@@ -143,7 +145,7 @@ class Board_m extends CI_Model
 	function delete_content($table, $no)
  	{
 		$delete_array = array(
-				'board_id' => $no
+				'seq_id' => $no
 		);
 
 		$result = $this->db->delete($table, $delete_array);
@@ -162,7 +164,7 @@ class Board_m extends CI_Model
 	 */
 	function writer_check($table, $board_id)
 	{
-		$sql = "SELECT user_id FROM ".$table." WHERE board_id = '".$board_id."'";
+		$sql = "SELECT user_id FROM ".$table." WHERE seq_id = '".$board_id."'";
 
 		$query = $this->db->query($sql);
 
@@ -181,7 +183,6 @@ class Board_m extends CI_Model
 		$insert_array = array(
 			'board_pid' => $arrays['board_pid'], //원글번호 입력
 			'user_id' => $arrays['user_id'],
-			'user_name' => $arrays['user_id'],
 			'subject' => $arrays['subject'],
 			'contents' => $arrays['contents'],
 			'reg_date' => date("Y-m-d H:i:s")
@@ -193,7 +194,30 @@ class Board_m extends CI_Model
 
 		//결과 반환
 		return $board_id;
- 	}
+	 }
+	 
+
+	 /* 댓글의 댓글 입력
+	  *
+	 */
+	 function insert_comment_re($arrays)
+ 	{
+		$insert_array = array(
+			'board_pid' => $arrays['board_pid'], //원글번호 입력
+			'reply_pid' => $arrays['reply_pid'],
+			'user_id' => $arrays['user_id'],
+			'comment_contents' => $arrays['comment_contents'],
+			'reg_date' => date("Y-m-d H:i:s")
+		);
+
+		$this->db->insert($arrays['table'], $insert_array);
+
+		$board_id = $this->db->insert_id();
+
+		//결과 반환
+		return $board_id;
+	 }
+	 
 
 	/**
 	 * 댓글 리스트 가져오기
@@ -205,14 +229,41 @@ class Board_m extends CI_Model
 	 */
     function get_comment($table, $id)
     {
-    	$sql = "SELECT * FROM ".$table." WHERE board_pid='".$id."' ORDER BY board_id DESC";
+    	$sql = "SELECT * FROM ".$table." WHERE board_pid='".$id."' ORDER BY seq_id DESC";
    		$query = $this->db->query($sql);
 
      	//댓글 리스트 반환
 	    $result = $query->result();
 
     	return $result;
-    }
+	}
+
+		/**
+	 * 대댓글 리스트 가져오기
+	 *
+	 * @author Jongwon Byun <advisor@cikorea.net>
+	 * @param string $table 게시판 테이블
+	 * @param string $id 게시물번호
+	 * @return array
+	 */
+    function get_recomment($table='reply', $id)
+    {
+		$sql = "SELECT * FROM {$table} WHERE board_pid='{$id}s' ORDER BY seq_id DESC";
+		
+		// $query = $this->db->SELECT()
+		// 	->FROM($table)
+		// 	->WHERE(borad_pid, $id)
+		// 	->ORDER_BY("seq_id DESC");
+
+		$result = $query->get()->result();
+   		$query = $this->db->query($sql);
+
+     	//댓글 리스트 반환
+	    $result = $query->result();
+
+    	return $result;
+	}
+
 }
 
 /* End of file board_m.php */
